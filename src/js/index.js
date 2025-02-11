@@ -1,40 +1,35 @@
 import * as THREE from 'three';
-import webGL from '../../node_modules/three/examples/jsm/capabilities/WebGL.js';
 
-// webGL 지원 여부 확인
-if (webGL.isWebGLAvailable()) {
-  // 장면 생성
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffe187);
+const $result = document.getElementById('result');
 
-  const camera = new THREE.PerspectiveCamera(
-    50,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
-  camera.position.set(3, 3, 3);
-  camera.lookAt(0, 0, 0);
+// 1. Scene: 화면에서 보여주려는 객체를 담는 공간
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffe187); // 배경색 설정
+// scene.add(요소)
 
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+// 2. Camera: SCene을 바라볼 시점을 결정
+const camera = new THREE.PerspectiveCamera(
+  50,
+  $result.clientWidth / $result.clientHeight,
+  0.1,
+  1000
+);
+camera.position.set(2, 2, 2); // 카메라를 어디에 둘 것인가?  (2, 2, 2) 좌표에 카메라를 놓는다는 의미
+camera.lookAt(0, 0, 0); // 카메라가 어디를 볼 것인가? 카메라가 바라보는 목표점을 설정 원점(0,0,0)을 바라보도록 설정
 
-  // 빛
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  scene.add(ambientLight);
+// 3. Renderer: Scene+Camera, 화면을 그려주는 역할
+const renderer = new THREE.WebGLRenderer({ canvas: $result, antialias: true });
+renderer.setSize($result.clientWidth, $result.clientHeight); // 사이즈조정
+// document.body.appendChild(renderer.domElement); // 캔버스 추가
 
-  const pointLight = new THREE.PointLight(0xffffff, 1);
-  pointLight.position.set(0, 2, 4);
-  scene.add(pointLight);
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(2, 4, 3);
+scene.add(light);
 
-  // 박스
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshStandardMaterial({ color: 0x2e6ff2 });
-  const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshStandardMaterial({ color: 0x2e6ff2 });
+const box = new THREE.Mesh(geometry, material);
+scene.add(box);
 
-  renderer.render(scene, camera);
-} else {
-  document.body.appendChild(webGL.getErrorMessage);
-}
+// 4. 렌더링
+renderer.render(scene, camera);
